@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>StoneMetal Market</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <button class="brand" data-view="catalog" aria-label="На главную">
+        <span class="brand-mark">SM</span>
+        <span>
+          <strong>StoneMetal</strong>
+          <small>гранит, плитка, металл</small>
+        </span>
+      </button>
+
+      <nav class="main-nav" aria-label="Главная навигация">
+        <button class="nav-link active" data-view="catalog">Каталог</button>
+        <button class="nav-link" data-view="admin" data-admin-link hidden>Админка</button>
+      </nav>
+
+      <div class="top-actions">
+        <button class="icon-button" id="themeToggle" type="button" title="Тема" aria-label="Переключить тему">
+          <span data-icon="sun"></span>
+        </button>
+        <button class="account-button" id="accountButton" type="button">
+          <span data-icon="user"></span>
+          <span id="accountText">Войти</span>
+        </button>
+        <button class="cart-button" id="cartButton" type="button" aria-label="Открыть корзину">
+          <span data-icon="shopping-cart"></span>
+          <span id="cartCount">0</span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="workspace view active" id="catalogView">
+        <aside class="filter-panel">
+          <div class="panel-title">
+            <span data-icon="sliders"></span>
+            <span>Подбор</span>
+          </div>
+
+          <label class="field">
+            <span>Поиск</span>
+            <input id="searchInput" type="search" placeholder="гранит, труба, профлист" />
+          </label>
+
+          <div class="field">
+            <span>Группы</span>
+            <div class="group-list" id="groupFilters"></div>
+          </div>
+
+          <label class="field">
+            <span>Сортировка</span>
+            <select id="sortSelect">
+              <option value="popular">Сначала популярные</option>
+              <option value="priceAsc">Цена по возрастанию</option>
+              <option value="priceDesc">Цена по убыванию</option>
+              <option value="stock">По наличию</option>
+            </select>
+          </label>
+
+          <div class="spec-strip">
+            <div>
+              <strong>24 ч</strong>
+              <span>сбор заказа</span>
+            </div>
+            <div>
+              <strong>ГОСТ</strong>
+              <span>металл</span>
+            </div>
+            <div>
+              <strong>резка</strong>
+              <span>под размер</span>
+            </div>
+          </div>
+        </aside>
+
+        <section class="catalog-area">
+          <div class="hero">
+            <div class="hero-copy">
+              <span class="eyebrow">складской маркет</span>
+              <h1>Материалы для объектов, цехов и частной стройки</h1>
+              <p>Гранитные плиты, керамогранит, слэбы, профлист и трубы с быстрым подбором, корзиной и управлением каталога.</p>
+            </div>
+            <div class="hero-metrics">
+              <div>
+                <strong id="metricGroups">0</strong>
+                <span>групп</span>
+              </div>
+              <div>
+                <strong id="metricProducts">0</strong>
+                <span>позиций</span>
+              </div>
+              <div>
+                <strong id="metricStock">0</strong>
+                <span>на складе</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="catalog-toolbar">
+            <div>
+              <h2>Каталог</h2>
+              <p id="catalogSummary">Позиции загружаются</p>
+            </div>
+            <button class="primary ghost" id="resetFilters" type="button">
+              <span data-icon="rotate-ccw"></span>
+              Сбросить
+            </button>
+          </div>
+
+          <div class="product-grid" id="productGrid"></div>
+          <div class="empty-state" id="catalogEmpty" hidden>
+            <span data-icon="package-search"></span>
+            <h3>Ничего не найдено</h3>
+            <p>Попробуй изменить поиск или выбрать другую группу.</p>
+          </div>
+        </section>
+      </section>
+
+      <section class="admin-shell view" id="adminView">
+        <div class="admin-head">
+          <div>
+            <span class="eyebrow">панель управления</span>
+            <h1>Админка магазина</h1>
+            <p>Создавай группы, редактируй карточки, добавляй изображения и управляй витриной.</p>
+          </div>
+          <button class="primary" id="seedResetButton" type="button">
+            <span data-icon="refresh-cw"></span>
+            Демо-данные
+          </button>
+        </div>
+
+        <div class="admin-tabs" role="tablist" aria-label="Разделы админки">
+          <button class="admin-tab active" data-admin-tab="groups" type="button">
+            <span data-icon="folder-tree"></span>
+            Группы
+          </button>
+          <button class="admin-tab" data-admin-tab="products" type="button">
+            <span data-icon="boxes"></span>
+            Товары
+          </button>
+          <button class="admin-tab" data-admin-tab="orders" type="button">
+            <span data-icon="receipt-text"></span>
+            Заказы
+          </button>
+        </div>
+
+        <div class="admin-grid admin-section active" id="groupsAdmin">
+          <form class="editor-panel" id="groupForm">
+            <div class="editor-title">
+              <h2 id="groupFormTitle">Новая группа</h2>
+              <button class="icon-button" id="clearGroupForm" type="button" title="Очистить" aria-label="Очистить форму">
+                <span data-icon="eraser"></span>
+              </button>
+            </div>
+            <input type="hidden" id="groupId" />
+            <label class="field">
+              <span>Название</span>
+              <input id="groupName" required maxlength="40" placeholder="Например: Гранитные плиты" />
+            </label>
+            <label class="field">
+              <span>Короткое описание</span>
+              <textarea id="groupDescription" rows="4" maxlength="220" placeholder="Где применяется и что внутри группы"></textarea>
+            </label>
+            <label class="field">
+              <span>Изображение</span>
+              <input id="groupImage" type="file" accept="image/*" />
+            </label>
+            <div class="image-preview" id="groupImagePreview"></div>
+            <button class="primary" type="submit">
+              <span data-icon="save"></span>
+              Сохранить группу
+            </button>
+          </form>
+
+          <div class="table-panel">
+            <div class="panel-title">
+              <span data-icon="layers"></span>
+              <span>Список групп</span>
+            </div>
+            <div class="admin-list" id="groupsList"></div>
+          </div>
+        </div>
+
+        <div class="admin-grid admin-section" id="productsAdmin">
+          <form class="editor-panel" id="productForm">
+            <div class="editor-title">
+              <h2 id="productFormTitle">Новый товар</h2>
+              <button class="icon-button" id="clearProductForm" type="button" title="Очистить" aria-label="Очистить форму">
+                <span data-icon="eraser"></span>
+              </button>
+            </div>
+            <input type="hidden" id="productId" />
+            <label class="field">
+              <span>Название</span>
+              <input id="productName" required maxlength="70" placeholder="Слэб Black Galaxy 30 мм" />
+            </label>
+            <div class="two-cols">
+              <label class="field">
+                <span>Группа</span>
+                <select id="productGroup" required></select>
+              </label>
+              <label class="field">
+                <span>Единица</span>
+                <select id="productUnit">
+                  <option>м2</option>
+                  <option>м.п.</option>
+                  <option>шт.</option>
+                  <option>т</option>
+                  <option>лист</option>
+                </select>
+              </label>
+            </div>
+            <div class="two-cols">
+              <label class="field">
+                <span>Цена</span>
+                <input id="productPrice" type="number" min="0" step="50" required />
+              </label>
+              <label class="field">
+                <span>Наличие</span>
+                <input id="productStock" type="number" min="0" step="1" required />
+              </label>
+            </div>
+            <label class="field">
+              <span>Размер / спецификация</span>
+              <input id="productSpec" maxlength="80" placeholder="3000x1500x30 мм, ГОСТ 10704-91" />
+            </label>
+            <label class="field">
+              <span>Описание</span>
+              <textarea id="productDescription" rows="4" maxlength="300" placeholder="Фактура, назначение, условия поставки"></textarea>
+            </label>
+            <label class="field">
+              <span>Изображение</span>
+              <input id="productImage" type="file" accept="image/*" />
+            </label>
+            <div class="image-preview" id="productImagePreview"></div>
+            <label class="toggle-line">
+              <input id="productFeatured" type="checkbox" />
+              <span>Показывать как популярный товар</span>
+            </label>
+            <button class="primary" type="submit">
+              <span data-icon="save"></span>
+              Сохранить товар
+            </button>
+          </form>
+
+          <div class="table-panel">
+            <div class="panel-title">
+              <span data-icon="warehouse"></span>
+              <span>Карточки товаров</span>
+            </div>
+            <div class="admin-list" id="productsList"></div>
+          </div>
+        </div>
+
+        <div class="table-panel admin-section" id="ordersAdmin">
+          <div class="panel-title">
+            <span data-icon="receipt-text"></span>
+            <span>Заказы из корзины</span>
+          </div>
+          <div class="admin-list orders" id="ordersList"></div>
+        </div>
+      </section>
+    </main>
+
+    <aside class="drawer" id="cartDrawer" aria-hidden="true">
+      <div class="drawer-head">
+        <div>
+          <h2>Корзина</h2>
+          <p id="cartSummary">Пока пусто</p>
+        </div>
+        <button class="icon-button" id="closeCart" type="button" title="Закрыть" aria-label="Закрыть корзину">
+          <span data-icon="x"></span>
+        </button>
+      </div>
+      <div class="cart-items" id="cartItems"></div>
+      <div class="cart-footer">
+        <div class="total-line">
+          <span>Итого</span>
+          <strong id="cartTotal">0 ₽</strong>
+        </div>
+        <button class="primary wide" id="checkoutButton" type="button">
+          <span data-icon="truck"></span>
+          Оформить заявку
+        </button>
+      </div>
+    </aside>
+
+    <div class="overlay" id="overlay" hidden></div>
+
+    <dialog class="auth-modal" id="authDialog">
+      <form method="dialog" class="modal-close-form">
+        <button class="icon-button" value="close" title="Закрыть" aria-label="Закрыть">
+          <span data-icon="x"></span>
+        </button>
+      </form>
+      <div class="auth-layout">
+        <div class="auth-aside">
+          <span class="eyebrow">личный кабинет</span>
+          <h2>Вход и регистрация</h2>
+          <p>Покупатель собирает корзину, администратор управляет каталогом и заявками.</p>
+          <div class="demo-login">
+            <strong>Демо-админ</strong>
+            <span>admin@stonemetal.ru</span>
+            <span>admin123</span>
+          </div>
+        </div>
+        <div class="auth-forms">
+          <div class="segmented">
+            <button class="segment active" data-auth-tab="login" type="button">Вход</button>
+            <button class="segment" data-auth-tab="register" type="button">Регистрация</button>
+          </div>
+
+          <form class="auth-form active" id="loginForm">
+            <label class="field">
+              <span>Email</span>
+              <input id="loginEmail" type="email" required autocomplete="email" />
+            </label>
+            <label class="field">
+              <span>Пароль</span>
+              <input id="loginPassword" type="password" required autocomplete="current-password" />
+            </label>
+            <button class="primary wide" type="submit">
+              <span data-icon="log-in"></span>
+              Войти
+            </button>
+          </form>
+
+          <form class="auth-form" id="registerForm">
+            <label class="field">
+              <span>Имя</span>
+              <input id="registerName" required autocomplete="name" />
+            </label>
+            <label class="field">
+              <span>Email</span>
+              <input id="registerEmail" type="email" required autocomplete="email" />
+            </label>
+            <label class="field">
+              <span>Пароль</span>
+              <input id="registerPassword" type="password" minlength="6" required autocomplete="new-password" />
+            </label>
+            <button class="primary wide" type="submit">
+              <span data-icon="user-plus"></span>
+              Создать аккаунт
+            </button>
+          </form>
+        </div>
+      </div>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
